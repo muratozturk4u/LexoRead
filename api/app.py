@@ -11,15 +11,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import logging
 
-# Import routers
-from routers import text_adaptation, ocr, tts, reading_level, user_profile, auth
+# Import routers (only import existing routers)
+from api.routers import adaptation, emotional_tts
 from api.summarization import router as summarization_router
 
 # Import configuration
-from config import settings
+from api.config import settings
 
 # Set up logging
-from utils.logging import setup_logging
+from api.utils.logging import setup_logging
 logger = logging.getLogger("api")
 
 # Create FastAPI application
@@ -47,13 +47,9 @@ async def add_process_time_header(request: Request, call_next):
     response.headers["X-Process-Time"] = str(process_time)
     return response
 
-# Include routers
-app.include_router(auth.router, prefix="/api", tags=["Authentication"])
-app.include_router(text_adaptation.router, prefix="/api/text", tags=["Text Adaptation"])
-app.include_router(ocr.router, prefix="/api/ocr", tags=["OCR"])
-app.include_router(tts.router, prefix="/api/tts", tags=["Text-to-Speech"])
-app.include_router(reading_level.router, prefix="/api/reading-level", tags=["Reading Level"])
-app.include_router(user_profile.router, prefix="/api/users", tags=["User Profile"])
+# Include routers (only existing routers — missing ones will be added as features)
+app.include_router(adaptation.router, prefix="/api/text", tags=["Text Adaptation"])
+app.include_router(emotional_tts.router, prefix="/api/tts", tags=["Text-to-Speech"])
 app.include_router(summarization_router, prefix="/api", tags=["Text Summarization"])
 
 # Health check endpoint
